@@ -28,7 +28,8 @@ exports.postSOSSignal = (req,res,next) => {
                     location:{
                         type: type,
                         coordinates: coordinates,
-                    }
+                    },
+                    $setOnInsert: {startTime: Date.now()}
                 },
                 {
                     upsert: true
@@ -54,7 +55,7 @@ exports.postSOSSignal = (req,res,next) => {
 exports.deletesosSignal = (req, res, next) => {
     Signal.deleteOne({userId: req.userId})
         .then(signal => {
-            if(signal.n >= 1){
+            if(signal.n == 1){
                 res.status(200).json({message: "Signal Deleted"})
             }
             else{

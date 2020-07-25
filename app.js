@@ -9,6 +9,9 @@ const mongoose = require('mongoose');
 const civAuthRoutes = require('./routes/civilian/auth');
 const civRoutes = require('./routes/civilian/civilian');
 
+const controlAuthRoutes = require('./routes/control/auth');
+const controlRoutes = require('./routes/control/control');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -22,7 +25,9 @@ app.use((req, res, next)=>{
 
 
 app.use('/civilian/auth',civAuthRoutes);
-app.use('/civilian',civRoutes)
+app.use('/civilian',civRoutes);
+app.use('/control/auth',controlAuthRoutes);
+app.use('/control',controlRoutes);
 
 app.use((err, req, res, next) => {
     res.status(500).json({ error : err})

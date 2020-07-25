@@ -20,7 +20,14 @@ const signalSchema = new Schema({
         type: [Number],
         required: true
       }
-    }
+    },
+    startTime: {
+      type: Date,
+      default: Date.now
+    },
+  },
+  {
+    timestamps: true
   });
 
   module.exports = mongoose.model('ActiveSignal', signalSchema);
