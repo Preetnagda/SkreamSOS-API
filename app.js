@@ -2,6 +2,8 @@
 
 const express = require('express');
 
+const socketioJwt   = require('socketio-jwt');
+
 const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
@@ -37,7 +39,18 @@ app.use((err, req, res, next) => {
 
 mongoose.connect('mongodb+srv://skreamSOSAPI:NeyMnZRCe1jVAY1R@mflix-2kbfl.mongodb.net/skreamSOS?retryWrites=true&w=majority')
     .then(result => {
-        app.listen(process.env.PORT || 8000);
+        const server = app.listen(process.env.PORT || 8000);
+        const io = require('./socket').init(server);
+        
+        io.sockets
+        .on('connection', socketioJwt.authorize({ 
+            secret: 'secretsuperkey',
+            timeout: 15000 // 15 seconds to send the authentication message
+        }))
+        .on('authenticated', (socket) => {
+            //this socket is authenticated, we are good to handle more events from it.
+            console.log("== websocket client authenticated ==");
+        });
     })
     .catch(err => {
         console.log(err);

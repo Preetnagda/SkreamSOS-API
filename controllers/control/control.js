@@ -8,7 +8,6 @@ const User = require('../../models/user');
 exports.getSOSSignal = (req,res,next) => {
 
     Signal.find({}).then(result => {
-        console.log(result);
         res.status(200).json(result);
     })
     .catch(err => {

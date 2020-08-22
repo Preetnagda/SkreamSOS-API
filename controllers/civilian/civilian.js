@@ -2,6 +2,7 @@ const {ObjectId} = require('bson');
 
 const { validationResult, Result } = require('express-validator')
 
+const io = require('./../../socket');
 const Signal = require('../../models/signals');
 const User = require('../../models/user');
 
@@ -17,10 +18,11 @@ exports.postSOSSignal = (req,res,next) => {
     }
     const type = req.body.type;
     const coordinates = req.body.coordinates;
+    let signal;
 
     User.findOne({_id : ObjectId(req.userId)})
         .then(user => {
-            Signal.updateOne(
+            signal = Signal.findOneAndUpdate(
                 {userId : req.userId},
                 {
                     name : user.name,
@@ -32,17 +34,20 @@ exports.postSOSSignal = (req,res,next) => {
                     $setOnInsert: {startTime: Date.now()}
                 },
                 {
-                    upsert: true
+                    upsert: true,
+                    new: true
+                },
+                (err , doc) => {
+                    if(err){
+                        if(!err.statusCode){
+                            err.statusCode = 500;
+                        }
+                        next(err);
+                    }
+                    io.getIO().emit('signal' , { action: 'create', doc: doc });
+                    res.json({message : "Distress Signal Recieved", doc: doc});
                 }
-            ).then(result => {
-                res.json({message : "Distress Signal Recieved"});
-            })
-            .catch(err => {
-                if(!err.statusCode){
-                    err.statusCode = 500;
-                }
-                next(err);
-            })  
+            )
         })
         .catch(err => {
             if(!err.statusCode){
