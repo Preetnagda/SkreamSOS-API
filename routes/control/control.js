@@ -7,6 +7,7 @@ const { body } = require('express-validator');
 const Signals = require('../../models/signals');
 const isAuth = require('../../middleware/control_isAuth');
 
+router.get('/sosSignal/media',isAuth,controlController.getSOSSignalImages);
 router.get('/sosSignal',isAuth, controlController.getSOSSignal);
 
 router.delete('/sosSignal',isAuth,[body('userId').exists()],controlController.deletesosSignal);

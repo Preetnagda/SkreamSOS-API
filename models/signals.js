@@ -10,6 +10,11 @@ const signalSchema = new Schema({
         ref: 'User',
         unique: true
     },
+    mediaId: {
+      type: Schema.Types.ObjectId, 
+      ref: 'Media',
+      unique: true
+    },
     location: {
       type: {
         type: String, 

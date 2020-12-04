@@ -5,6 +5,44 @@ const { validationResult, Result } = require('express-validator')
 const io = require('./../../socket');
 const Signal = require('../../models/signals');
 const User = require('../../models/user');
+const Media = require('../../models/media');
+
+
+
+exports.postSOSSignalImage = (req,res,next) => {
+
+    Media.findOneAndUpdate(
+        {userId: req.userId},
+        { $push: { images: req.file.buffer } },
+        {
+            upsert:true,
+        },
+        (err, doc) => {
+            if(err){
+                if(!err.statusCode){
+                    err.statusCode = 500;
+                }
+                next(err);
+            }
+            console.log(doc);
+
+            Signal.findOneAndUpdate(
+                {userId : req.userId},
+                { mediaId: doc._id },
+                (err,success) => {
+                    if(err){
+                        if(!err.statusCode){
+                            err.statusCode = 500;
+                        }
+                        next(err);
+                    }
+                    res.status(200).json({message: "Image Recieved"});
+                }
+            );
+        }
+    )
+    res.status(500);
+}
 
 exports.postSOSSignal = (req,res,next) => {
     const errors = validationResult(req);

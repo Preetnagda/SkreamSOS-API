@@ -4,6 +4,7 @@ const { validationResult, Result } = require('express-validator')
 
 const Signal = require('../../models/signals');
 const User = require('../../models/user');
+const Media = require('../../models/media');
 
 exports.getSOSSignal = (req,res,next) => {
 
@@ -16,6 +17,25 @@ exports.getSOSSignal = (req,res,next) => {
         }
         next(err);
     })
+
+}
+
+exports.getSOSSignalImages = (req,res,next) => {
+    console.log(req.body.signalUserId);
+
+    Media.findOne(
+        {userId: req.body.signalUserId},
+        (err,doc)=> {
+            if(err){
+                if(!err.statusCode){
+                    err.statusCode = 500;
+                }
+                next(err);
+            }
+            res.status(200).json({doc: doc});
+        }
+
+    )
 
 }
 
